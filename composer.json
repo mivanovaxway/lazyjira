@@ -1,0 +1,14 @@
+{
+  "name": "mivanov/lazyjira",
+  "description": "Jira PHP automation",
+  "type": "project",
+  "require": {
+	"php": "^7.0",
+	"lesstif/php-jira-rest-client": "^1.20"
+  },
+  "autoload": {
+	"psr-4": {
+	  "Mivanov\\LazyJira\\": "src/"
+	}
+  }
+}
