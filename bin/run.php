@@ -2,8 +2,9 @@
 
 use JiraRestApi\Configuration\ArrayConfiguration;
 use JiraRestApi\Issue\IssueService;
-use Mivanov\LazyJira\ListIssuesCommand;
-use Mivanov\LazyJira\MoveToDoneCommand;
+use Mivanov\{
+    LazyJira\Helper\ConsoleFormatter, LazyJira\ListIssuesCommand, LazyJira\MoveToDoneCommand, LazyJira\ViewIssueCommand
+};
 use Symfony\Component\Console\Application;
 
 require_once(__DIR__ . "/../vendor/autoload.php");
@@ -20,6 +21,8 @@ $iss         = new IssueService(new ArrayConfiguration(
     )
 ));
 
-$application->add(new ListIssuesCommand("list-issues", $iss));
+$consoleFormatter = new ConsoleFormatter();
+$application->add(new ListIssuesCommand("list-issues", $consoleFormatter, $iss, ['ADE']));
+$application->add(new ViewIssueCommand("view", $consoleFormatter, $iss));
 $application->add(new MoveToDoneCommand("done", $iss));
 $application->run();
