@@ -108,4 +108,9 @@ class ConsoleFormatter
 
         return $issueStatus;
     }
+
+    public function issueKeyColored(string $issueKey): string
+    {
+        return "<bg=green;fg=black>{$issueKey}</>";
+    }
 }

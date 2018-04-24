@@ -22,7 +22,7 @@ $iss         = new IssueService(new ArrayConfiguration(
 ));
 
 $consoleFormatter = new ConsoleFormatter();
-$application->add(new ListIssuesCommand("list-issues", $consoleFormatter, $iss, ['ADE']));
+$application->add(new ListIssuesCommand("ls", $consoleFormatter, $iss, ['ADE']));
 $application->add(new ViewIssueCommand("view", $consoleFormatter, $iss));
 $application->add(new MoveToDoneCommand("done", $iss));
 $application->run();

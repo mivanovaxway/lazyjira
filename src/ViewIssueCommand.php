@@ -15,6 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ViewIssueCommand extends Command
 {
@@ -51,9 +52,10 @@ class ViewIssueCommand extends Command
         InputInterface $input,
         OutputInterface $output
     ) {
+        $io      = new SymfonyStyle($input, $output);
         $issueId = $input->getArgument("issueId");
         $issue   = $this->jiraClient->get($issueId);
-        $output->writeln("Issue: {$issue->key}");
+        $output->writeln("Issue: " . $this->consoleFormatter->issueKeyColored($issue->key));
         $output->writeln("Name: {$issue->fields->summary}");
         $output->writeln("Reporter: {$issue->fields->reporter->name}");
         if (isset($issue->fields->assignee)) {
@@ -61,6 +63,13 @@ class ViewIssueCommand extends Command
         }
         if (isset($issue->fields->description)) {
             $output->writeln("Description: \n\n" . $this->consoleFormatter->replaceJiraMarkup($issue->fields->description));
+        }
+        if (isset($issue->fields->comment)) {
+            $output->writeln("<fg=green>Comments:</>");
+            foreach ($issue->fields->comment->comments as $comment) {
+                $output->writeln("{$comment->author->name} wrote: \n\n" . $this->consoleFormatter->replaceJiraMarkup($comment->body));
+                $io->newLine();
+            }
         }
     }
 }
