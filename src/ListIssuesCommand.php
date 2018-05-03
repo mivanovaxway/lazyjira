@@ -59,6 +59,7 @@ class ListIssuesCommand extends Command
         $this->addOption("mine", "m", InputOption::VALUE_NONE, "Show just mine issues");
         $this->addOption("projects", "p", InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, "Projects(array)");
         $this->addOption("types", "t", InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, "Issue types");
+        $this->addOption("statuses", "s", InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, "Issue statuses");
         $this->addArgument("offset", InputArgument::OPTIONAL, "Result offset", 0);
         $this->addArgument("maxResults", InputArgument::OPTIONAL, "Max results", 15);
     }
@@ -73,6 +74,7 @@ class ListIssuesCommand extends Command
         $reporter   = $input->getOption("reporter");
         $mine       = $input->getOption("mine");
         $types      = $input->getOption("types");
+        $statuses   = $input->getOption("statuses");
         $projects   = !empty($input->getOption("projects")) ? $input->getOption("projects") : $this->defaultProjects;
         $offset     = $input->getArgument("offset");
         $maxResults = $input->getArgument("maxResults");
@@ -92,13 +94,16 @@ class ListIssuesCommand extends Command
         if (!empty($types)) {
             $jqlQuery->addInExpression("type", $types);
         }
+        if (!empty($statuses)) {
+            $jqlQuery->addInExpression("status", $statuses);
+        }
         $ret     = $this->jiraClient->search($jqlQuery->getQuery(), $offset, $maxResults);
         $results = [];
         $header  = ['Issue', 'Title', 'Assignee', 'Status', 'Type', 'Versions'];
         /** @var Issue $issue */
         foreach ($ret->getIssues() as $issue) {
-            echo var_export($issue->fields->getCustomFields()['customfield_11730'], true);
-            echo var_export($issue->fields->versions, true);
+            //todo: sprint
+            //echo var_export($issue->fields->getCustomFields()['customfield_11730'], true);
             $formattedIssue = new IssueConsoleFormatter($issue);
             $issueRow       = [];
             $issueRow[]     = $formattedIssue->getKey();
