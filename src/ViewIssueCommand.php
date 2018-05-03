@@ -11,6 +11,7 @@ namespace Mivanov\LazyJira;
 
 use JiraRestApi\Issue\IssueService;
 use Mivanov\LazyJira\Helper\ConsoleFormatter;
+use Mivanov\LazyJira\Helper\IssueConsoleFormatter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -52,14 +53,18 @@ class ViewIssueCommand extends Command
         InputInterface $input,
         OutputInterface $output
     ) {
-        $io      = new SymfonyStyle($input, $output);
-        $issueId = $input->getArgument("issueId");
-        $issue   = $this->jiraClient->get($issueId);
-        $output->writeln("Issue: " . $this->consoleFormatter->issueKeyColored($issue->key));
-        $output->writeln("Name: {$issue->fields->summary}");
-        $output->writeln("Reporter: {$issue->fields->reporter->name}");
+        $io             = new SymfonyStyle($input, $output);
+        $issueId        = $input->getArgument("issueId");
+        $issue          = $this->jiraClient->get($issueId);
+        $issueFormatted = new IssueConsoleFormatter($issue);
+        $output->writeln("Issue: " . $issueFormatted->getKey());
+        $output->writeln("Type: " . $issueFormatted->getTypeName());
+        $output->writeln("Status: " . $issueFormatted->getStatus());
+        $output->writeln("Versions: " . $issueFormatted->getVersions());
+        $output->writeln("Summary: {$issue->fields->summary}");
+        $output->writeln("Reporter: " . $issueFormatted->getReporter());
         if (isset($issue->fields->assignee)) {
-            $output->writeln("Assignee: " . $issue->fields->assignee->name);
+            $output->writeln("Assignee: " . $issueFormatted->getAssignee());
         }
         if (isset($issue->fields->description)) {
             $output->writeln("Description: \n\n" . $this->consoleFormatter->replaceJiraMarkup($issue->fields->description));
@@ -68,7 +73,7 @@ class ViewIssueCommand extends Command
             $output->writeln("<fg=green>Comments:</>");
             foreach ($issue->fields->comment->comments as $comment) {
                 $output->writeln("{$comment->author->name} wrote: \n\n" . $this->consoleFormatter->replaceJiraMarkup($comment->body));
-                $io->newLine();
+                $output->writeln(str_repeat("-", 10));
             }
         }
     }

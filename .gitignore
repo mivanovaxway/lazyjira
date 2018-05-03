@@ -1,3 +1,6 @@
 /vendor
 /.idea
 password
+/jiraClientConfig.yaml
+/jiraServerConfig.yaml
+/jiraProjectConfig.yaml
